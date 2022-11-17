@@ -1,0 +1,25 @@
+
+DROP PROCEDURE IF EXISTS mesos;
+
+DELIMITER $
+CREATE PROCEDURE mesos(IN evaluator_username VARCHAR(20))
+BEGIN
+
+
+
+
+
+SELECT AVG(finalgrade)
+FROM evaluationresult
+WHERE evalid in 
+(SELECT evalid  FROM evaluation WHERE ev_username=evaluator_username);
+
+
+
+
+
+
+
+
+END $
+DELIMITER ;

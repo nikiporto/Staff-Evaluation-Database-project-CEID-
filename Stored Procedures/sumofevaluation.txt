@@ -1,0 +1,53 @@
+DELIMITER $
+CREATE PROCEDURE sumofevaluation(IN evaluatorID INT,IN jobID INT)
+BEGIN
+
+DECLARE total INT(10);
+DECLARE id INT(10);
+
+DECLARE inter ENUM ('0','1','2','3','4');
+DECLARE rep ENUM ('0','1','2','3','4');
+DECLARE cap ENUM ('0','1','2');
+
+SELECT evaluation.evalid,  interview,report,capability, (interview+report+capability - 3) AS total 
+into id,  inter, rep , cap, total
+FROM evaluation
+INNER JOIN evaluator ON evaluation.ev_username=evaluator.ev_username
+INNER JOIN announces ON evaluator.ev_username=announces.username
+INNER JOIN job_position ON announces.jobid=job_position.jobid
+WHERE evaluatorID=evaluator.ev_code AND jobID=job_position.jobid
+LIMIT 1;
+
+
+
+IF (inter>0 AND rep>0 AND cap>0) THEN
+	
+	INSERT INTO evaluationresult (ad_username, evalid, finalgrade)
+	VALUES ("ABernard",id, total);
+
+	SELECT finalgrade
+	FROM evaluationresult
+	INNER JOIN evaluation ON evaluation.evalid=evaluationresult.evalid
+	INNER JOIN evaluator ON evaluation.ev_username=evaluator.ev_username
+	INNER JOIN announces ON evaluator.ev_username=announces.username
+	INNER JOIN job_position ON announces.jobid=job_position.jobid
+	WHERE evaluatorID=evaluator.ev_code AND jobID=job_position.jobid;
+	
+ELSE
+	SELECT 'Not all phases completed';
+END IF;   
+END$
+DELIMITER ;
+
+
+call sumofevaluation(1,1);
+
+
+drop procedure sumofevaluation;
+
+---------------------------------------------------------------------------------------------------------
+Για διευκόλυνση σας:
+Οι συνδιασμοί των  id του evaluator και των id του job_position για την sumofevaluation procedure 
+που βγάζουν αποτελεσμα για το finalgrade ειναι οι : (1,1),(1,8),(2,3),(3,4).
+
+

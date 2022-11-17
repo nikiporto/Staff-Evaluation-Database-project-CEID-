@@ -1,0 +1,51 @@
+
+DROP PROCEDURE IF EXISTS evaluationStatus;
+
+DELIMITER $
+
+CREATE PROCEDURE evaluationStatus(IN jid INT)
+BEGIN
+ 
+DECLARE l INT;
+DECLARE k INT;
+
+SELECT count(em_username) INTO l from requests WHERE jobid=jid;
+
+
+SELECT count(finalgrade) INTO k FROM evaluationresult 
+INNER JOIN evaluation ON evaluation.evalid=evaluationresult.evalid
+INNER JOIN evaluator ON evaluation.ev_username=evaluator.ev_username
+INNER JOIN announces ON evaluator.ev_username=announces.username
+INNER JOIN job_position ON announces.jobid=job_position.jobid
+WHERE jid=job_position.jobid;
+
+
+IF (l=k) THEN 
+  
+   SELECT 'ORISTIKOPOIMENOI PINAKES'; 
+
+   SELECT em_username AS upallilos,finalgrade AS bathmologia FROM evaluationresult 
+   INNER JOIN evaluation ON evaluation.evalid=evaluationresult.evalid
+   INNER JOIN evaluator ON evaluation.ev_username=evaluator.ev_username
+   INNER JOIN announces ON evaluator.ev_username=announces.username
+   INNER JOIN job_position ON announces.jobid=job_position.jobid
+   WHERE jid=job_position.jobid
+   ORDER BY finalgrade DESC;
+
+ELSEIF (l>k) THEN
+
+   SELECT 'EKREMOYN AJIOLOGISEIS';
+   SELECT em_username AS upallilos,finalgrade AS bathmologia FROM evaluationresult 
+   INNER JOIN evaluation ON evaluation.evalid=evaluationresult.evalid
+   INNER JOIN evaluator ON evaluation.ev_username=evaluator.ev_username
+   INNER JOIN announces ON evaluator.ev_username=announces.username
+   INNER JOIN job_position ON announces.jobid=job_position.jobid
+   WHERE jid=job_position.jobid
+   ORDER BY finalgrade DESC;
+
+ELSEIF (l=0) THEN
+     SELECT 'NO REQUEST';
+END IF ;
+
+END$
+DELIMITER ;

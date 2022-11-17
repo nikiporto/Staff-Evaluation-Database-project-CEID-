@@ -1,0 +1,26 @@
+
+DROP TRIGGER IF EXISTS companyUpdate;
+
+DELIMITER $
+CREATE TRIGGER companyUpdate BEFORE UPDATE ON company
+FOR EACH ROW
+BEGIN
+ 
+   SET NEW.afm=OLD.afm; 
+   SET NEW.companyName=OLD.companyName; 
+   SET NEW.DOY=OLD.DOY; 
+
+END$
+
+DELIMITER ;
+
+
+
+
+
+
+elegxos
+UPDATE company SET afm='1111111' WHERE companyName='Dunder Mifflin';
+
+
+SELECT afm FROM company WHERE companyName='Dunder Mifflin';
